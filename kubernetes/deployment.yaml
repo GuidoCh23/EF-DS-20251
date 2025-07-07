@@ -1,0 +1,91 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: legacy-app-deployment
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: legacy-app
+  template:
+    metadata:
+      labels:
+        app: legacy-app
+    spec:
+      containers:
+      - name: legacy-app
+        image: legacy-app:latest
+        ports:
+        - containerPort: 8000
+        env:
+        - name: DATABASE_URL
+          value: "postgresql://$(POSTGRES_USER):$(POSTGRES_PASSWORD)@postgres-service:5432/$(POSTGRES_DB)"
+        - name: POSTGRES_USER
+          valueFrom:
+            secretKeyRef:
+              name: postgres-secret
+              key: POSTGRES_USER
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: postgres-secret
+              key: POSTGRES_PASSWORD
+        - name: POSTGRES_DB
+          valueFrom:
+            secretKeyRef:
+              name: postgres-secret
+              key: POSTGRES_DB
+        - name: API_ENDPOINT
+          valueFrom:
+            configMapKeyRef:
+              name: app-config
+              key: API_ENDPOINT
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: legacy-app-service
+spec:
+  selector:
+    app: legacy-app
+  ports:
+  - port: 8000
+    targetPort: 8000
+  type: ClusterIP
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: new-microservice-deployment
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: new-microservice
+  template:
+    metadata:
+      labels:
+        app: new-microservice
+    spec:
+      containers:
+      - name: new-microservice
+        image: new-microservice:latest
+        ports:
+        - containerPort: 8001
+        env:
+        - name: LEGACY_APP_URL
+          value: "http://legacy-app-service:8000"
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: new-microservice-service
+spec:
+  selector:
+    app: new-microservice
+  ports:
+  - port: 8001
+    targetPort: 8001
+  type: Clusterip
