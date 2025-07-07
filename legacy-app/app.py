@@ -1,10 +1,10 @@
 from fastapi import FastAPI
 
-app = FastAPI(title="Aplicación Legacy", version="1.0.0")
+app = FastAPI(title="Aplicacion Legacy", version="1.0.0")
 
 @app.get("/")
 def leer_raiz():
-    return {"mensaje": "Aplicación Legacy está ejecutándose"}
+    return {"mensaje": "Aplicacion Legacy esta ejecutandose"}
 
 @app.get("/salud")
 def verificar_salud():
