@@ -1,0 +1,22 @@
+# python
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+
+# entornos virtuales
+.venv/
+venv/
+.env
+
+# carpetas build
+build/
+dist/
+
+# git
+.git/
+.gitignore
+
+# documentation
+README.md
+*.md
