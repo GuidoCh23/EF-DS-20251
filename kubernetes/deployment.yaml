@@ -88,4 +88,4 @@ spec:
   ports:
   - port: 8001
     targetPort: 8001
-  type: Clusterip
+  type: ClusterIP
